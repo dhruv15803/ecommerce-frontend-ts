@@ -39,6 +39,12 @@ export interface Product {
   productthumbnail: string;
 }
 
+export interface SubCategory {
+  subcategoryid:number;
+  subcategoryname:string;
+  productcategoryid:number;
+}
+
 export interface productCategoryType {
   productcategoryid: number;
   categoryname: string;

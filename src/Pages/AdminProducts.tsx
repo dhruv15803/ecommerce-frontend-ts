@@ -10,9 +10,11 @@ const AdminProducts = () => {
   const [productDescription, setProductDescription] = useState<string>("");
   const [productPrice, setProductPrice] = useState<number>(0);
   const [productStock, setProductStock] = useState<number>(0);
+  const { productCategories }: { productCategories: productCategoryType[] } =
+    useContext(GlobalContext);
   const [productCategory,setProductCategory] = useState<string>("");
-  const {productCategories}:{productCategories:productCategoryType[]}  = useContext(GlobalContext);
 
+  console.log(productCategory);
   const uploadProductThumbnail = async () => {
     try {
       if (productThumbnail === "") {
@@ -41,6 +43,17 @@ const AdminProducts = () => {
     uploadProductThumbnail();
   }, [productThumbnail]);
 
+  useEffect(()=>{
+    const setInitialCategory = () => {
+      if(productCategories.length===0){
+        setProductCategory("");
+      } else {
+        setProductCategory(productCategories[0]?.categoryname);
+      }
+    }
+    setInitialCategory();
+  },[productCategories])
+
   return (
     <>
       <div className="border-2 rounded-lg flex flex-col shadow-lg mx-10 p-4">
@@ -48,7 +61,11 @@ const AdminProducts = () => {
         <form className="flex flex-col  my-8 gap-4">
           <div className="flex flex-col justify-center gap-2">
             {productThumbnailUrl !== "" && (
-              <img src={productThumbnailUrl} className="w-24 border-2 p-2 rounded-lg" alt="" />
+              <img
+                src={productThumbnailUrl}
+                className="w-24 border-2 p-2 rounded-lg"
+                alt=""
+              />
             )}
             <label
               className="flex justify-center items-center gap-2 border-2 rounded-lg p-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white hover:duration-300 w-[15%]"
@@ -122,11 +139,26 @@ const AdminProducts = () => {
             />
           </div>
           <div className="flex flex-col justify-center gap-2">
-            <label className="text-red-400" htmlFor="productCategory">Select product category</label>
-            <select className="border-2 rounded-lg p-2" value={productCategory} onChange={(e) => setProductCategory(e.target.value)} name="productCategory" id="productCategory">
-                {productCategories?.map((category) => {
-                    return <option key={category.productcategoryid} value={category.categoryname}>{category.categoryname}</option>
-                })}
+            <label className="text-red-400" htmlFor="productCategory">
+              Select product category
+            </label>
+            <select
+              className="border-2 rounded-lg p-2"
+              value={productCategory}
+              onChange={(e) => setProductCategory(e.target.value)}
+              name="productCategory"
+              id="productCategory"
+            >
+              {productCategories?.map((category) => {
+                return (
+                  <option
+                    key={category.productcategoryid}
+                    value={category.categoryname}
+                  >
+                    {category.categoryname}
+                  </option>
+                );
+              })}
             </select>
           </div>
           <button className="flex justify-center items-center gap-2 border-2 rounded-lg p-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white hover:duration-300 w-[25%] m-auto mt-8">

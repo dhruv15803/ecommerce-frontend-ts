@@ -17,6 +17,7 @@ const AdminCategories = () => {
   } = useContext(GlobalContext);
   const [addCategoryErrorMsg, setAddCategoryErrorMsg] = useState<string>("");
 
+  
   const addProductCategory = async (e: React.FormEvent<HTMLFormElement>) => {
     try {
       e.preventDefault();
