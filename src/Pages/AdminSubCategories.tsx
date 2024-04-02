@@ -141,7 +141,7 @@ const AdminSubCategories = () => {
           })}
           <div
             onClick={() => setIsAddSubCategory(!isAddSubCategory)}
-            className="text-red-500 hover:underline hover:underline-offset-4"
+            className="cursor-pointer text-red-500 hover:underline hover:underline-offset-4"
           >
             {isAddSubCategory ? "cancel" : "Add subcategory"}
           </div>

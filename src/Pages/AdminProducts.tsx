@@ -1,7 +1,13 @@
 import axios from "axios";
-import React, { useContext, useEffect, useState } from "react";
+import React, { SetStateAction, useContext, useEffect, useState } from "react";
 import { FaImage } from "react-icons/fa";
-import { GlobalContext, backendUrl, productCategoryType } from "../App";
+import {
+  GlobalContext,
+  Product,
+  SubCategory,
+  backendUrl,
+  productCategoryType,
+} from "../App";
 
 const AdminProducts = () => {
   const [productThumbnail, setProductThumbnail] = useState<File | string>("");
@@ -10,11 +16,20 @@ const AdminProducts = () => {
   const [productDescription, setProductDescription] = useState<string>("");
   const [productPrice, setProductPrice] = useState<number>(0);
   const [productStock, setProductStock] = useState<number>(0);
-  const { productCategories }: { productCategories: productCategoryType[] } =
-    useContext(GlobalContext);
-  const [productCategory,setProductCategory] = useState<string>("");
+  const {
+    productCategories,
+    products,
+    setProducts,
+  }:{
+    productCategories: productCategoryType[];
+    products: Product[];
+    setProducts: React.Dispatch<React.SetStateAction<Product[] | []>>;
+  } = useContext(GlobalContext);
+  const [productCategory, setProductCategory] = useState<string>("");
+  const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
+  const [subCategory, setSubCategory] = useState<string>("");
+  const [subCategoryErrorMsg, setSubCategoryErrorMsg] = useState<string>("");
 
-  console.log(productCategory);
   const uploadProductThumbnail = async () => {
     try {
       if (productThumbnail === "") {
@@ -39,26 +54,86 @@ const AdminProducts = () => {
     }
   };
 
+  const getSubCategoriesByCategoryName = async () => {
+    try {
+      const response = await axios.post(
+        `${backendUrl}/product/getSubCategoriesByCategoryName`,
+        {
+          categoryname: productCategory,
+        },
+        { withCredentials: true }
+      );
+      console.log(response);
+      setSubCategories(response.data.subcategories);
+      setSubCategory(response.data.subcategories[0]?.subcategoryname);
+    } catch (error: any) {
+      console.log(error);
+      setSubCategories(error.response?.data.subcategories);
+      setSubCategoryErrorMsg(error.response?.data.message);
+    }
+  };
+
+  const addProduct = async (e: React.FormEvent<HTMLFormElement>) => {
+    try {
+      e.preventDefault();
+      const response = await axios.post(
+        `${backendUrl}/product/add`,
+        {
+          productName,
+          productDescription,
+          productPrice,
+          productStock,
+          productCategory,
+          subCategory,
+          productThumbnailUrl,
+        },
+        { withCredentials: true }
+      );
+      console.log(response);
+      setProducts((prevProducts) => {
+        return [...prevProducts, response.data.product];
+      });
+      setProductName("");
+      setProductDescription("");
+      setProductPrice(0);
+      setProductStock(0);
+      setProductCategory(productCategories[0]?.categoryname);
+      setSubCategory(subCategories[0]?.subcategoryname);
+      setProductThumbnailUrl("");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  console.log(subCategories);
+
   useEffect(() => {
     uploadProductThumbnail();
   }, [productThumbnail]);
 
-  useEffect(()=>{
+  useEffect(() => {
+    getSubCategoriesByCategoryName();
+  }, [productCategory]);
+
+  useEffect(() => {
     const setInitialCategory = () => {
-      if(productCategories.length===0){
+      if (productCategories.length === 0) {
         setProductCategory("");
       } else {
         setProductCategory(productCategories[0]?.categoryname);
       }
-    }
+    };
     setInitialCategory();
-  },[productCategories])
+  }, [productCategories]);
 
   return (
     <>
       <div className="border-2 rounded-lg flex flex-col shadow-lg mx-10 p-4">
         <h1 className="text-red-500 font-semibold text-xl">Add products</h1>
-        <form className="flex flex-col  my-8 gap-4">
+        <form
+          onSubmit={(e) => addProduct(e)}
+          className="flex flex-col  my-8 gap-4"
+        >
           <div className="flex flex-col justify-center gap-2">
             {productThumbnailUrl !== "" && (
               <img
@@ -160,6 +235,36 @@ const AdminProducts = () => {
                 );
               })}
             </select>
+          </div>
+          <div className="flex flex-col justify-center gap-2">
+            <label className="text-red-400" htmlFor="subCategory">
+              Select subcategory
+            </label>
+            {subCategories?.length === 0 && (
+              <div className="text-xl text-red-500 font-semibold">
+                {subCategoryErrorMsg}
+              </div>
+            )}
+            {subCategories?.length !== 0 && (
+              <select
+                className="border-2 rounded-lg p-2"
+                value={subCategory}
+                onChange={(e) => setSubCategory(e.target.value)}
+                name="subCategory"
+                id="subCategory"
+              >
+                {subCategories?.map((subcategory) => {
+                  return (
+                    <option
+                      key={subcategory.subcategoryid}
+                      value={subcategory.subcategoryname}
+                    >
+                      {subcategory.subcategoryname}
+                    </option>
+                  );
+                })}
+              </select>
+            )}
           </div>
           <button className="flex justify-center items-center gap-2 border-2 rounded-lg p-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white hover:duration-300 w-[25%] m-auto mt-8">
             Add product
