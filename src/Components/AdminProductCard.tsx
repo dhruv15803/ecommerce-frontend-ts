@@ -17,6 +17,7 @@ type AdminProductCardProps = {
   productcategoryid: number;
   subcategoryid: number;
   productid: number;
+  deleteProduct:(id:number) => void;
 };
 
 const AdminProductCard = ({
@@ -28,6 +29,7 @@ const AdminProductCard = ({
   productcategoryid,
   subcategoryid,
   productid,
+  deleteProduct,
 }: AdminProductCardProps) => {
   const [productCategoryName, setProductCategoryName] = useState<string>("");
   const [subCategoryName, setSubCategoryName] = useState<string>("");
@@ -347,7 +349,7 @@ const AdminProductCard = ({
               </>
             ) : (
               <>
-                <button className="border-2 rounded-lg border-red-500 text-red-500 hover:bg-red-500 hover:text-white hover:duration-300 p-2">
+                <button onClick={() => deleteProduct(productid)} className="border-2 rounded-lg border-red-500 text-red-500 hover:bg-red-500 hover:text-white hover:duration-300 p-2">
                   Delete
                 </button>
                 <button

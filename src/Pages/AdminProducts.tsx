@@ -21,7 +21,7 @@ const AdminProducts = () => {
     productCategories,
     products,
     setProducts,
-  }:{
+  }: {
     productCategories: productCategoryType[];
     products: Product[];
     setProducts: React.Dispatch<React.SetStateAction<Product[] | []>>;
@@ -30,7 +30,7 @@ const AdminProducts = () => {
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
   const [subCategory, setSubCategory] = useState<string>("");
   const [subCategoryErrorMsg, setSubCategoryErrorMsg] = useState<string>("");
-  const [isAddProduct,setIsAddProduct] = useState<boolean>(false);
+  const [isAddProduct, setIsAddProduct] = useState<boolean>(false);
 
   const uploadProductThumbnail = async () => {
     try {
@@ -107,6 +107,24 @@ const AdminProducts = () => {
     }
   };
 
+  const deleteProduct = async (id: number) => {
+    try {
+      const response = await axios.delete(
+        `${backendUrl}/product/deleteProduct/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(response);
+      const newProducts = products.filter(
+        (product) => product.productid !== id
+      );
+      setProducts(newProducts);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   console.log(products);
 
   useEffect(() => {
@@ -130,165 +148,173 @@ const AdminProducts = () => {
 
   return (
     <>
-      <div onClick={() => setIsAddProduct(!isAddProduct)} className=" mx-10 cursor-pointer text-red-500 hover:underline hover:underline-offset-2 my-4">
+      <div
+        onClick={() => setIsAddProduct(!isAddProduct)}
+        className=" mx-10 cursor-pointer text-red-500 hover:underline hover:underline-offset-2 my-4"
+      >
         {isAddProduct ? "Cancel" : "Add product"}
       </div>
-      {isAddProduct && <div className="border-2 rounded-lg flex flex-col shadow-lg mx-10 p-4">
-        <h1 className="text-red-500 font-semibold text-xl">Add products</h1>
-        <form
-          onSubmit={(e) => addProduct(e)}
-          className="flex flex-col  my-8 gap-4"
-        >
-          <div className="flex flex-col justify-center gap-2">
-            {productThumbnailUrl !== "" && (
-              <img
-                src={productThumbnailUrl}
-                className="w-24 border-2 p-2 rounded-lg"
-                alt=""
+      {isAddProduct && (
+        <div className="border-2 rounded-lg flex flex-col shadow-lg mx-10 p-4">
+          <h1 className="text-red-500 font-semibold text-xl">Add products</h1>
+          <form
+            onSubmit={(e) => addProduct(e)}
+            className="flex flex-col  my-8 gap-4"
+          >
+            <div className="flex flex-col justify-center gap-2">
+              {productThumbnailUrl !== "" && (
+                <img
+                  src={productThumbnailUrl}
+                  className="w-24 border-2 p-2 rounded-lg"
+                  alt=""
+                />
+              )}
+              <label
+                className="flex justify-center items-center gap-2 border-2 rounded-lg p-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white hover:duration-300 w-[15%]"
+                htmlFor="productThumbnail"
+              >
+                <FaImage />
+                Add image
+              </label>
+              <input
+                hidden
+                type="file"
+                onChange={(e) => setProductThumbnail(e.target.files![0])}
+                name="productThumbnail"
+                id="productThumbnail"
               />
-            )}
-            <label
-              className="flex justify-center items-center gap-2 border-2 rounded-lg p-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white hover:duration-300 w-[15%]"
-              htmlFor="productThumbnail"
-            >
-              <FaImage />
-              Add image
-            </label>
-            <input
-              hidden
-              type="file"
-              onChange={(e) => setProductThumbnail(e.target.files![0])}
-              name="productThumbnail"
-              id="productThumbnail"
-            />
-          </div>
-          <div className="flex flex-col justify-center gap-2">
-            <label className="text-red-400" htmlFor="productName">
-              Enter product name
-            </label>
-            <input
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
-              className="border-2 rounded-lg p-2"
-              type="text"
-              name="productName"
-              id="productName"
-              placeholder="eg: black cotton t-shirt"
-            />
-          </div>
-          <div className="flex flex-col justify-center gap-2">
-            <label className="text-red-400" htmlFor="productDescription">
-              Enter product description
-            </label>
-            <input
-              value={productDescription}
-              onChange={(e) => setProductDescription(e.target.value)}
-              className="border-2 rounded-lg p-2"
-              type="text"
-              name="productDescription"
-              id="productDescription"
-              placeholder="eg: 100% cotton black v-neck t-shirt"
-            />
-          </div>
-          <div className="flex flex-col justify-center gap-2">
-            <label className="text-red-400" htmlFor="productPrice">
-              Enter product price
-            </label>
-            <input
-              value={productPrice}
-              onChange={(e) => setProductPrice(Number(e.target.value))}
-              className="border-2 rounded-lg p-2"
-              type="number"
-              name="productPrice"
-              id="productPrice"
-              placeholder="eg: 900 Rs"
-            />
-          </div>
-          <div className="flex flex-col justify-center gap-2">
-            <label className="text-red-400" htmlFor="productStock">
-              Enter product stock
-            </label>
-            <input
-              value={productStock}
-              onChange={(e) => setProductStock(Number(e.target.value))}
-              className="border-2 rounded-lg p-2"
-              type="number"
-              name="productStock"
-              id="productStock"
-              placeholder="eg: 20"
-            />
-          </div>
-          <div className="flex flex-col justify-center gap-2">
-            <label className="text-red-400" htmlFor="productCategory">
-              Select product category
-            </label>
-            <select
-              className="border-2 rounded-lg p-2"
-              value={productCategory}
-              onChange={(e) => setProductCategory(e.target.value)}
-              name="productCategory"
-              id="productCategory"
-            >
-              {productCategories?.map((category) => {
-                return (
-                  <option
-                    key={category.productcategoryid}
-                    value={category.categoryname}
-                  >
-                    {category.categoryname}
-                  </option>
-                );
-              })}
-            </select>
-          </div>
-          <div className="flex flex-col justify-center gap-2">
-            <label className="text-red-400" htmlFor="subCategory">
-              Select subcategory
-            </label>
-            {subCategories?.length === 0 && (
-              <div className="text-xl text-red-500 font-semibold">
-                {subCategoryErrorMsg}
-              </div>
-            )}
-            {subCategories?.length !== 0 && (
+            </div>
+            <div className="flex flex-col justify-center gap-2">
+              <label className="text-red-400" htmlFor="productName">
+                Enter product name
+              </label>
+              <input
+                value={productName}
+                onChange={(e) => setProductName(e.target.value)}
+                className="border-2 rounded-lg p-2"
+                type="text"
+                name="productName"
+                id="productName"
+                placeholder="eg: black cotton t-shirt"
+              />
+            </div>
+            <div className="flex flex-col justify-center gap-2">
+              <label className="text-red-400" htmlFor="productDescription">
+                Enter product description
+              </label>
+              <input
+                value={productDescription}
+                onChange={(e) => setProductDescription(e.target.value)}
+                className="border-2 rounded-lg p-2"
+                type="text"
+                name="productDescription"
+                id="productDescription"
+                placeholder="eg: 100% cotton black v-neck t-shirt"
+              />
+            </div>
+            <div className="flex flex-col justify-center gap-2">
+              <label className="text-red-400" htmlFor="productPrice">
+                Enter product price
+              </label>
+              <input
+                value={productPrice}
+                onChange={(e) => setProductPrice(Number(e.target.value))}
+                className="border-2 rounded-lg p-2"
+                type="number"
+                name="productPrice"
+                id="productPrice"
+                placeholder="eg: 900 Rs"
+              />
+            </div>
+            <div className="flex flex-col justify-center gap-2">
+              <label className="text-red-400" htmlFor="productStock">
+                Enter product stock
+              </label>
+              <input
+                value={productStock}
+                onChange={(e) => setProductStock(Number(e.target.value))}
+                className="border-2 rounded-lg p-2"
+                type="number"
+                name="productStock"
+                id="productStock"
+                placeholder="eg: 20"
+              />
+            </div>
+            <div className="flex flex-col justify-center gap-2">
+              <label className="text-red-400" htmlFor="productCategory">
+                Select product category
+              </label>
               <select
                 className="border-2 rounded-lg p-2"
-                value={subCategory}
-                onChange={(e) => setSubCategory(e.target.value)}
-                name="subCategory"
-                id="subCategory"
+                value={productCategory}
+                onChange={(e) => setProductCategory(e.target.value)}
+                name="productCategory"
+                id="productCategory"
               >
-                {subCategories?.map((subcategory) => {
+                {productCategories?.map((category) => {
                   return (
                     <option
-                      key={subcategory.subcategoryid}
-                      value={subcategory.subcategoryname}
+                      key={category.productcategoryid}
+                      value={category.categoryname}
                     >
-                      {subcategory.subcategoryname}
+                      {category.categoryname}
                     </option>
                   );
                 })}
               </select>
-            )}
-          </div>
-          <button className="flex justify-center items-center gap-2 border-2 rounded-lg p-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white hover:duration-300 w-[25%] m-auto mt-8">
-            Add product
-          </button>
-        </form>
-      </div>}
+            </div>
+            <div className="flex flex-col justify-center gap-2">
+              <label className="text-red-400" htmlFor="subCategory">
+                Select subcategory
+              </label>
+              {subCategories?.length === 0 && (
+                <div className="text-xl text-red-500 font-semibold">
+                  {subCategoryErrorMsg}
+                </div>
+              )}
+              {subCategories?.length !== 0 && (
+                <select
+                  className="border-2 rounded-lg p-2"
+                  value={subCategory}
+                  onChange={(e) => setSubCategory(e.target.value)}
+                  name="subCategory"
+                  id="subCategory"
+                >
+                  {subCategories?.map((subcategory) => {
+                    return (
+                      <option
+                        key={subcategory.subcategoryid}
+                        value={subcategory.subcategoryname}
+                      >
+                        {subcategory.subcategoryname}
+                      </option>
+                    );
+                  })}
+                </select>
+              )}
+            </div>
+            <button className="flex justify-center items-center gap-2 border-2 rounded-lg p-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white hover:duration-300 w-[25%] m-auto mt-8">
+              Add product
+            </button>
+          </form>
+        </div>
+      )}
       <div className="flex flex-col gap-4 mx-10 my-2 border-2 p-4">
         {products?.map((product) => {
-          return <AdminProductCard 
-          key={product.productid}
-          productname={product.productname}
-          productdescription={product.productdescription}
-          productprice={product.productprice}
-          productstock={product.productstock}
-          productthumbnail={product.productthumbnail}
-          productcategoryid={product.productcategoryid}
-          subcategoryid={product.subcategoryid}
-          productid={product.productid}
-          />
+          return (
+            <AdminProductCard
+              key={product.productid}
+              productname={product.productname}
+              productdescription={product.productdescription}
+              productprice={product.productprice}
+              productstock={product.productstock}
+              productthumbnail={product.productthumbnail}
+              productcategoryid={product.productcategoryid}
+              subcategoryid={product.subcategoryid}
+              productid={product.productid}
+              deleteProduct={deleteProduct}
+            />
+          );
         })}
       </div>
     </>
