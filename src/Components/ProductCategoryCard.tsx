@@ -21,7 +21,7 @@ const ProductCategoryCard = ({
   const {
     productCategories,
     setProductCategories,
-  }: {
+  }:{
     productCategories: productCategoryType[];
     setProductCategories: React.Dispatch<
       React.SetStateAction<productCategoryType[] | []>

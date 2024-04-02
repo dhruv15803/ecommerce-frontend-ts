@@ -8,6 +8,7 @@ import {
   backendUrl,
   productCategoryType,
 } from "../App";
+import AdminProductCard from "../Components/AdminProductCard";
 
 const AdminProducts = () => {
   const [productThumbnail, setProductThumbnail] = useState<File | string>("");
@@ -29,6 +30,7 @@ const AdminProducts = () => {
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
   const [subCategory, setSubCategory] = useState<string>("");
   const [subCategoryErrorMsg, setSubCategoryErrorMsg] = useState<string>("");
+  const [isAddProduct,setIsAddProduct] = useState<boolean>(false);
 
   const uploadProductThumbnail = async () => {
     try {
@@ -105,7 +107,7 @@ const AdminProducts = () => {
     }
   };
 
-  console.log(subCategories);
+  console.log(products);
 
   useEffect(() => {
     uploadProductThumbnail();
@@ -128,7 +130,10 @@ const AdminProducts = () => {
 
   return (
     <>
-      <div className="border-2 rounded-lg flex flex-col shadow-lg mx-10 p-4">
+      <div onClick={() => setIsAddProduct(!isAddProduct)} className=" mx-10 cursor-pointer text-red-500 hover:underline hover:underline-offset-2 my-4">
+        {isAddProduct ? "Cancel" : "Add product"}
+      </div>
+      {isAddProduct && <div className="border-2 rounded-lg flex flex-col shadow-lg mx-10 p-4">
         <h1 className="text-red-500 font-semibold text-xl">Add products</h1>
         <form
           onSubmit={(e) => addProduct(e)}
@@ -270,6 +275,21 @@ const AdminProducts = () => {
             Add product
           </button>
         </form>
+      </div>}
+      <div className="flex flex-col gap-4 mx-10 my-2 border-2 p-4">
+        {products?.map((product) => {
+          return <AdminProductCard 
+          key={product.productid}
+          productname={product.productname}
+          productdescription={product.productdescription}
+          productprice={product.productprice}
+          productstock={product.productstock}
+          productthumbnail={product.productthumbnail}
+          productcategoryid={product.productcategoryid}
+          subcategoryid={product.subcategoryid}
+          productid={product.productid}
+          />
+        })}
       </div>
     </>
   );

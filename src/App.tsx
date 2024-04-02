@@ -11,6 +11,18 @@ import AdminProducts from "./Pages/AdminProducts";
 import AdminCategories from "./Pages/AdminCategories";
 import AdminSubCategories from "./Pages/AdminSubCategories";
 
+// ecommerce
+// made register page
+// made login page
+// made admin app product page(add functionality, (edit ,delete , filter) -> pending)
+// made admin add category (edit and delete functionality)
+// made admin add subcategory(edit and delete functionality)
+// cart - pending
+// customer side - pending
+// orders - pending
+// payment - pending
+// responsive - pending
+
 export const backendUrl = "http://localhost:5000";
 
 export const GlobalContext = createContext(null);
@@ -32,6 +44,7 @@ export interface User {
 export interface Product {
   productid: number;
   productname: string;
+  productdescription:string;
   productprice: number;
   productstock: number;
   productcategoryid: number;
@@ -40,9 +53,9 @@ export interface Product {
 }
 
 export interface SubCategory {
-  subcategoryid:number;
-  subcategoryname:string;
-  productcategoryid:number;
+  subcategoryid: number;
+  subcategoryname: string;
+  productcategoryid: number;
 }
 
 export interface productCategoryType {
@@ -83,9 +96,19 @@ function App() {
     }
   };
 
+  const getAllProducts = async () => {
+    try {
+      const response = await axios.get(`${backendUrl}/product/getAllProducts`);
+      setProducts(response.data.products);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     getAllProductCategories();
     getLoggedInUser();
+    getAllProducts();
   }, []);
 
   return (
