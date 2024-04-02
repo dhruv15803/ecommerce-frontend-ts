@@ -31,6 +31,10 @@ const AdminProducts = () => {
   const [subCategory, setSubCategory] = useState<string>("");
   const [subCategoryErrorMsg, setSubCategoryErrorMsg] = useState<string>("");
   const [isAddProduct, setIsAddProduct] = useState<boolean>(false);
+  const [filterCategoryId, setFilterCategoryId] = useState<number | string>(
+    "none"
+  );
+  const [sortByProductAmount, setSortByProductAmount] = useState<number>(0);
 
   const uploadProductThumbnail = async () => {
     try {
@@ -125,7 +129,26 @@ const AdminProducts = () => {
     }
   };
 
+  const sortProductsByAmount = async () => {
+    try {
+      const response = await axios.post(
+        `${backendUrl}/product/sortByAmount`,
+        {
+          sortByProductAmount,
+        },
+        { withCredentials: true }
+      );
+      setProducts(response.data.products);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   console.log(products);
+
+  useEffect(()=>{
+    sortProductsByAmount();
+  },[sortByProductAmount])
 
   useEffect(() => {
     uploadProductThumbnail();
@@ -145,6 +168,8 @@ const AdminProducts = () => {
     };
     setInitialCategory();
   }, [productCategories]);
+
+  console.log(filterCategoryId);
 
   return (
     <>
@@ -299,23 +324,69 @@ const AdminProducts = () => {
           </form>
         </div>
       )}
-      <div className="flex flex-col gap-4 mx-10 my-2 border-2 p-4">
-        {products?.map((product) => {
-          return (
-            <AdminProductCard
-              key={product.productid}
-              productname={product.productname}
-              productdescription={product.productdescription}
-              productprice={product.productprice}
-              productstock={product.productstock}
-              productthumbnail={product.productthumbnail}
-              productcategoryid={product.productcategoryid}
-              subcategoryid={product.subcategoryid}
-              productid={product.productid}
-              deleteProduct={deleteProduct}
-            />
-          );
-        })}
+      <div className="border-2 rounded-lg p-2 mx-10 flex items-center gap-6">
+        <div className="flex items-center gap-2">
+          <label htmlFor="filterCategoryId">Filter by category</label>
+          <select
+            value={filterCategoryId}
+            onChange={(e) => setFilterCategoryId(e.target.value)}
+            className="border-2 rounded-lg p-2"
+            name="filterCategoryId"
+            id="filterCategoryId"
+          >
+            <option value="none">none</option>
+            {productCategories?.map((category) => {
+              return (
+                <option
+                  key={category.productcategoryid}
+                  value={category.productcategoryid}
+                >
+                  {category.categoryname}
+                </option>
+              );
+            })}
+          </select>
+        </div>
+        <div className="flex items-center gap-2">
+          <p>Sort by amount</p>
+          <select
+            className="border-2 rounded-lg p-2"
+            value={sortByProductAmount}
+            onChange={(e) => setSortByProductAmount(Number(e.target.value))}
+            name="sortByProductAmount"
+            id="sortByProductAmount"
+          >
+            <option value={0}>none</option>
+            <option value={1}>low to high</option>
+            <option value={-1}>high to low</option>
+          </select>
+        </div>
+      </div>
+      <div className="flex flex-col gap-4 mx-10 my-2  p-4">
+        {products
+          ?.filter((product) => {
+            if (filterCategoryId === "none") {
+              return product;
+            } else {
+              return product.productcategoryid === filterCategoryId;
+            }
+          })
+          ?.map((product) => {
+            return (
+              <AdminProductCard
+                key={product.productid}
+                productname={product.productname}
+                productdescription={product.productdescription}
+                productprice={product.productprice}
+                productstock={product.productstock}
+                productthumbnail={product.productthumbnail}
+                productcategoryid={product.productcategoryid}
+                subcategoryid={product.subcategoryid}
+                productid={product.productid}
+                deleteProduct={deleteProduct}
+              />
+            );
+          })}
       </div>
     </>
   );

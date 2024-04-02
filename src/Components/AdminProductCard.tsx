@@ -46,7 +46,7 @@ const AdminProductCard = ({
     productCategories,
     products,
     setProducts,
-  }: {
+  }:{
     productCategories: productCategoryType[];
     products: Product[];
     setProducts: React.Dispatch<React.SetStateAction<Product[] | []>>;
@@ -185,12 +185,12 @@ const AdminProductCard = ({
       <div className="flex border-2 rounded-lg p-2 shadow-lg gap-4">
         <div className="flex flex-col gap-4 w-[20%]">
           {!isProductEdit && (
-            <div className="flex flex-wrap border-2 justify-center">
+            <div className="flex flex-wrap justify-center">
               <img className="h-40" src={productthumbnail} alt="" />
             </div>
           )}
           {isProductEdit && (
-            <div className="flex flex-wrap border-2 justify-center">
+            <div className="flex flex-wrap justify-center">
               <img className="h-40" src={newProductThumbnailUrl} alt="" />
             </div>
           )}
@@ -212,7 +212,7 @@ const AdminProductCard = ({
             </div>
           )}
         </div>
-        <div className="flex flex-col gap-2 border-2 w-[80%] p-2">
+        <div className="flex flex-col gap-2 w-[80%] p-2">
           <div className="flex text-2xl font-bold flex-wrap">
             {isProductEdit ? (
               <>
