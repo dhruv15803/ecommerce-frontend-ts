@@ -10,6 +10,7 @@ import AdminLayout from "./Layouts/AdminLayout";
 import AdminProducts from "./Pages/AdminProducts";
 import AdminCategories from "./Pages/AdminCategories";
 import AdminSubCategories from "./Pages/AdminSubCategories";
+import Profile from "./Pages/Profile";
 
 // ecommerce
 // made register page
@@ -133,6 +134,7 @@ function App() {
               <Route index element={<Home />} />
               <Route path="register" element={<Register />} />
               <Route path="login" element={<Login />} />
+              <Route path="profile" element={<Profile/>}/>
               <Route path="admin" element={<AdminLayout />}>
                 <Route index element={<AdminProducts />} />
                 <Route path="categories" element={<AdminCategories />} />
