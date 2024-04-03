@@ -9,6 +9,7 @@ import {
   productCategoryType,
 } from "../App";
 import AdminProductCard from "../Components/AdminProductCard";
+import Loader from "../Components/Loader";
 
 const AdminProducts = () => {
   const [productThumbnail, setProductThumbnail] = useState<File | string>("");
@@ -35,12 +36,20 @@ const AdminProducts = () => {
     "none"
   );
   const [sortByProductAmount, setSortByProductAmount] = useState<number>(0);
+  const [isAvatarLoading, setIsAvatarLoading] = useState<boolean>(false);
+  const [filterSubCategoryId, setFilterSubCategoryId] = useState<
+    number | string
+  >("none");
+  const [filterSubCategories, setFilterSubCategories] = useState<SubCategory[]>(
+    []
+  );
 
   const uploadProductThumbnail = async () => {
     try {
       if (productThumbnail === "") {
         return;
       }
+      setIsAvatarLoading(true);
       const response = await axios.post(
         `${backendUrl}/product/uploadProductThumbnail`,
         {
@@ -54,9 +63,11 @@ const AdminProducts = () => {
         }
       );
       console.log(response);
+      setIsAvatarLoading(false);
       setProductThumbnailUrl(response.data.productThumbnailUrl);
     } catch (error) {
       console.log(error);
+      setIsAvatarLoading(false);
     }
   };
 
@@ -76,6 +87,25 @@ const AdminProducts = () => {
       console.log(error);
       setSubCategories(error.response?.data.subcategories);
       setSubCategoryErrorMsg(error.response?.data.message);
+    }
+  };
+
+  const getSubCategoriesByCategoryId = async () => {
+    try {
+      if(filterCategoryId==="none"){
+        return;
+      }
+      const response = await axios.post(
+        `${backendUrl}/product/getSubCategories`,
+        {
+          productcategoryid: Number(filterCategoryId),
+        }
+      );
+      console.log(response);
+      setFilterSubCategories(response.data.subcategories);
+      setFilterSubCategoryId("none");
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -146,9 +176,9 @@ const AdminProducts = () => {
 
   console.log(products);
 
-  useEffect(()=>{
+  useEffect(() => {
     sortProductsByAmount();
-  },[sortByProductAmount])
+  }, [sortByProductAmount]);
 
   useEffect(() => {
     uploadProductThumbnail();
@@ -157,6 +187,10 @@ const AdminProducts = () => {
   useEffect(() => {
     getSubCategoriesByCategoryName();
   }, [productCategory]);
+
+  useEffect(()=>{
+    getSubCategoriesByCategoryId();
+  },[filterCategoryId])
 
   useEffect(() => {
     const setInitialCategory = () => {
@@ -169,13 +203,14 @@ const AdminProducts = () => {
     setInitialCategory();
   }, [productCategories]);
 
-  console.log(filterCategoryId);
+  console.log('filterSubCategoryId', filterSubCategoryId);
+  console.log('filterCategoryId',filterCategoryId);
 
   return (
     <>
       <div
         onClick={() => setIsAddProduct(!isAddProduct)}
-        className=" mx-10 cursor-pointer text-red-500 hover:underline hover:underline-offset-2 my-4"
+        className="w-fit mx-10 cursor-pointer text-red-500 hover:underline hover:underline-offset-2 my-4"
       >
         {isAddProduct ? "Cancel" : "Add product"}
       </div>
@@ -194,20 +229,28 @@ const AdminProducts = () => {
                   alt=""
                 />
               )}
-              <label
-                className="flex justify-center items-center gap-2 border-2 rounded-lg p-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white hover:duration-300 w-[15%]"
-                htmlFor="productThumbnail"
-              >
-                <FaImage />
-                Add image
-              </label>
-              <input
-                hidden
-                type="file"
-                onChange={(e) => setProductThumbnail(e.target.files![0])}
-                name="productThumbnail"
-                id="productThumbnail"
-              />
+              {isAvatarLoading ? (
+                <>
+                  <Loader height="80" width="80" />
+                </>
+              ) : (
+                <>
+                  <label
+                    className="flex justify-center items-center gap-2 border-2 rounded-lg p-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white hover:duration-300 w-[15%]"
+                    htmlFor="productThumbnail"
+                  >
+                    <FaImage />
+                    Add image
+                  </label>
+                  <input
+                    hidden
+                    type="file"
+                    onChange={(e) => setProductThumbnail(e.target.files![0])}
+                    name="productThumbnail"
+                    id="productThumbnail"
+                  />
+                </>
+              )}
             </div>
             <div className="flex flex-col justify-center gap-2">
               <label className="text-red-400" htmlFor="productName">
@@ -361,6 +404,19 @@ const AdminProducts = () => {
             <option value={-1}>high to low</option>
           </select>
         </div>
+
+        {filterCategoryId!=="none" && <>
+        <div className="flex items-center gap-2">
+          <p>filter by subcategory</p>
+          <select className="border-2 rounded-lg p-2" value={filterSubCategoryId} onChange={(e) => setFilterSubCategoryId(e.target.value)} name="filterSubCategoryId" id="filterSubCategoryId">
+            <option value="none">none</option>
+            {filterSubCategories?.map((subcategory) => {
+              return <option key={subcategory.subcategoryid} value={subcategory.subcategoryid}>{subcategory.subcategoryname}</option>
+            })}
+          </select>
+        </div>
+        </>}
+
       </div>
       <div className="flex flex-col gap-4 mx-10 my-2  p-4">
         {products
@@ -371,7 +427,13 @@ const AdminProducts = () => {
               return product.productcategoryid === filterCategoryId;
             }
           })
-          ?.map((product) => {
+          ?.filter((product) => {
+            if(filterSubCategoryId==="none"){
+              return product;
+            } else {
+              return product.subcategoryid===filterSubCategoryId;
+            }
+          })?.map((product) => {
             return (
               <AdminProductCard
                 key={product.productid}

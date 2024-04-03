@@ -7,6 +7,7 @@ import {
   backendUrl,
   productCategoryType,
 } from "../App";
+import Loader from "./Loader";
 
 type AdminProductCardProps = {
   productname: string;
@@ -55,6 +56,7 @@ const AdminProductCard = ({
   const [newProductThumbnail, setNewProductThumbnail] = useState<File | "">("");
   const [newProductThumbnailUrl, setNewProductThumbnailUrl] =
     useState<string>("");
+  const [isProductThumbnailLoading,setIsProductThumbnailLoading] = useState<boolean>(false);
 
   const getProductCategoryById = async () => {
     try {
@@ -103,6 +105,7 @@ const AdminProductCard = ({
 
   const uploadProductThumbnail = async () => {
     try {
+      setIsProductThumbnailLoading(true);
       const response = await axios.post(
         `${backendUrl}/product/uploadProductThumbnail`,
         {
@@ -116,9 +119,11 @@ const AdminProductCard = ({
         }
       );
       console.log(response);
+      setIsProductThumbnailLoading(false);
       setNewProductThumbnailUrl(response.data.productThumbnailUrl);
     } catch (error) {
       console.log(error);
+      setIsProductThumbnailLoading(false);
     }
   };
 
@@ -189,6 +194,9 @@ const AdminProductCard = ({
               <img className="h-40" src={productthumbnail} alt="" />
             </div>
           )}
+          {isProductThumbnailLoading ? <div className="flex justify-center">
+          <Loader height="80" width="80"/>
+          </div> : <>
           {isProductEdit && (
             <div className="flex flex-wrap justify-center">
               <img className="h-40" src={newProductThumbnailUrl} alt="" />
@@ -211,6 +219,7 @@ const AdminProductCard = ({
               />
             </div>
           )}
+          </>}
         </div>
         <div className="flex flex-col gap-2 w-[80%] p-2">
           <div className="flex text-2xl font-bold flex-wrap">
