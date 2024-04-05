@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { SetStateAction, useContext, useEffect, useState } from "react";
+import React, {useContext, useEffect, useState } from "react";
 import { FaImage } from "react-icons/fa";
 import {
   GlobalContext,
@@ -367,12 +367,16 @@ const AdminProducts = () => {
           </form>
         </div>
       )}
-      <div className="border-2 rounded-lg p-2 mx-10 flex items-center gap-6">
+      {products.length!==0 && <div className="border-2 rounded-lg p-2 mx-10 flex items-center gap-6">
         <div className="flex items-center gap-2">
           <label htmlFor="filterCategoryId">Filter by category</label>
           <select
             value={filterCategoryId}
-            onChange={(e) => setFilterCategoryId(e.target.value)}
+            onChange={(e) => {
+              setFilterCategoryId(e.target.value);
+              setFilterSubCategoryId("none");
+            }
+            }
             className="border-2 rounded-lg p-2"
             name="filterCategoryId"
             id="filterCategoryId"
@@ -416,8 +420,7 @@ const AdminProducts = () => {
           </select>
         </div>
         </>}
-
-      </div>
+      </div>}
       <div className="flex flex-col gap-4 mx-10 my-2  p-4">
         {products
           ?.filter((product) => {
@@ -449,6 +452,43 @@ const AdminProducts = () => {
               />
             );
           })}
+        {products?.filter((product) => {
+            if (filterCategoryId === "none") {
+              return product;
+            } else {
+              return product.productcategoryid === filterCategoryId;
+            }
+          })?.length===0 && <div className="flex justify-center my-20">
+            <div className="text-2xl text-red-500">No products in this category</div>
+          </div>}
+        {(products?.filter((product) => {
+          if(filterCategoryId==="none"){
+            return product;
+          } else {
+            return product.productcategoryid===filterCategoryId;
+          }
+        }).length!==0 &&products
+        ?.filter((product) => {
+          if (filterCategoryId === "none") {
+            return product;
+          } else {
+            return product.productcategoryid === filterCategoryId;
+          }
+        })
+        ?.filter((product) => {
+          if(filterSubCategoryId==="none"){
+            return product;
+          } else {
+            return product.subcategoryid===filterSubCategoryId;
+          }
+        })?.length===0) && <div className="flex justify-center my-20">
+          <div className="text-2xl text-red-500">No products in this subcategory</div>
+          </div>}
+        {products.length===0 && <div className="my-20">
+          <div className="text-2xl text-red-500 flex justify-center">
+            No products added
+          </div>
+        </div>}
       </div>
     </>
   );
