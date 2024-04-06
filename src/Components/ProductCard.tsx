@@ -55,7 +55,7 @@ try {
 
   return (
     <>
-      <div className="border-2 gap-4 rounded-lg p-2 w-[25%] h-96 shadow-lg flex flex-col">
+      <div className="w-full border-2 gap-4 rounded-lg p-2 sm:w-[25%] h-96 shadow-lg flex flex-col">
         <div className="flex justify-center h-[45%]">
           <img
             src={productthumbnail}

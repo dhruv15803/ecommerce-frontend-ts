@@ -41,7 +41,7 @@ const ProductsLayout = () => {
   useEffect(() => {
     getSubCategoriesByCategoryId();
     getProductCategoryById();
-  }, []);
+  }, [categoryid]);
 
   console.log(subCategories);
 

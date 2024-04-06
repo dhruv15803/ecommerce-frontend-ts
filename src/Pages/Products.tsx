@@ -17,7 +17,7 @@ const Products = () => {
 
   return (
     <>
-      <div className="flex flex-wrap my-10 items-center gap-4 p-4 border-2 justify-center">
+      <div className="flex flex-col sm:flex-row flex-wrap my-10 items-center gap-4 p-4 justify-center">
         {products?.filter(
             (product) => String(product.productcategoryid) === params.categoryid
           )?.filter((product) => {
