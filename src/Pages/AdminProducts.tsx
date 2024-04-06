@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, {useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FaImage } from "react-icons/fa";
 import {
   GlobalContext,
@@ -10,6 +10,7 @@ import {
 } from "../App";
 import AdminProductCard from "../Components/AdminProductCard";
 import Loader from "../Components/Loader";
+import * as Papa from "papaparse";
 
 const AdminProducts = () => {
   const [productThumbnail, setProductThumbnail] = useState<File | string>("");
@@ -43,6 +44,8 @@ const AdminProducts = () => {
   const [filterSubCategories, setFilterSubCategories] = useState<SubCategory[]>(
     []
   );
+  const [csvFile,setCsvFile] = useState<File | string>("");
+  const [csvData,setCsvData] = useState<any>([]);
 
   const uploadProductThumbnail = async () => {
     try {
@@ -92,7 +95,7 @@ const AdminProducts = () => {
 
   const getSubCategoriesByCategoryId = async () => {
     try {
-      if(filterCategoryId==="none"){
+      if (filterCategoryId === "none") {
         return;
       }
       const response = await axios.post(
@@ -141,6 +144,19 @@ const AdminProducts = () => {
     }
   };
 
+  const addCsvProducts = async () => {
+try {
+  const response = await axios.post(`${backendUrl}/product/addCsv`,{
+    "csvData":csvData,
+  },{withCredentials:true});
+  console.log(response);
+  setProducts(prevProducts => [...prevProducts,...response.data.newProducts]);
+  setCsvFile("");
+} catch (error) {
+  console.log(error);
+}
+  };
+
   const deleteProduct = async (id: number) => {
     try {
       const response = await axios.delete(
@@ -174,6 +190,16 @@ const AdminProducts = () => {
     }
   };
 
+  const parseCsvFile = () => {
+    Papa.parse(csvFile,{
+      complete:(result:any) => {
+        setCsvData(result.data);
+      },
+      header:true,
+      skipEmptyLines:true,
+    })
+  };
+
   console.log(products);
 
   useEffect(() => {
@@ -188,9 +214,15 @@ const AdminProducts = () => {
     getSubCategoriesByCategoryName();
   }, [productCategory]);
 
-  useEffect(()=>{
+  useEffect(() => {
     getSubCategoriesByCategoryId();
-  },[filterCategoryId])
+  }, [filterCategoryId]);
+
+  useEffect(()=>{
+    parseCsvFile();
+  },[csvFile])
+
+  console.log(csvData);
 
   useEffect(() => {
     const setInitialCategory = () => {
@@ -203,16 +235,27 @@ const AdminProducts = () => {
     setInitialCategory();
   }, [productCategories]);
 
-  console.log('filterSubCategoryId', filterSubCategoryId);
-  console.log('filterCategoryId',filterCategoryId);
+  console.log("filterSubCategoryId", filterSubCategoryId);
+  console.log("filterCategoryId", filterCategoryId);
 
   return (
     <>
-      <div
-        onClick={() => setIsAddProduct(!isAddProduct)}
-        className="w-fit mx-10 cursor-pointer text-red-500 hover:underline hover:underline-offset-2 my-4"
-      >
-        {isAddProduct ? "Cancel" : "Add product"}
+      <div className="flex items-center mx-10 gap-4 text-red-500">
+        <div
+          onClick={() => setIsAddProduct(!isAddProduct)}
+          className="w-fit cursor-pointer text-red-500 hover:underline hover:underline-offset-2 my-4"
+        >
+          {isAddProduct ? "Cancel" : "Add product"}
+        </div>
+        {csvFile==="" ? <div className="cursor-pointer hover:underline hover:underline-offset-2">
+          <label htmlFor="csvFile">upload csv file</label>
+          <input hidden onChange={(e) =>setCsvFile(e.target.files![0])} type="file" name="csvFile" id="csvFile"/>
+        </div> : <>
+        <div className="flex gap-2">
+          <button className="hover:underline hover:underline-offset-4" onClick={() => setCsvFile("")}>remove file</button>
+          <button className="hover:underline hover:underline-offset-4" onClick={addCsvProducts}>submit file</button>
+        </div>
+        </>}
       </div>
       {isAddProduct && (
         <div className="border-2 rounded-lg flex flex-col shadow-lg mx-10 p-4">
@@ -239,7 +282,9 @@ const AdminProducts = () => {
                     className="w-[25%] flex justify-center items-center gap-2 border-2 rounded-lg p-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white hover:duration-300 lg:w-[15%]"
                     htmlFor="productThumbnail"
                   >
-                    <button className="text-2xl"><FaImage /></button>
+                    <button className="text-2xl">
+                      <FaImage />
+                    </button>
                     Add image
                   </label>
                   <input
@@ -367,60 +412,76 @@ const AdminProducts = () => {
           </form>
         </div>
       )}
-      {products.length!==0 && <div className="border-2 rounded-lg p-2 mx-10 flex flex-wrap items-center gap-6">
-        <div className="flex items-center gap-2">
-          <label htmlFor="filterCategoryId">Filter by category</label>
-          <select
-            value={filterCategoryId}
-            onChange={(e) => {
-              setFilterCategoryId(e.target.value);
-              setFilterSubCategoryId("none");
-            }
-            }
-            className="border-2 rounded-lg p-2"
-            name="filterCategoryId"
-            id="filterCategoryId"
-          >
-            <option value="none">none</option>
-            {productCategories?.map((category) => {
-              return (
-                <option
-                  key={category.productcategoryid}
-                  value={category.productcategoryid}
-                >
-                  {category.categoryname}
-                </option>
-              );
-            })}
-          </select>
-        </div>
-        <div className="flex items-center gap-2">
-          <p>Sort by amount</p>
-          <select
-            className="border-2 rounded-lg p-2"
-            value={sortByProductAmount}
-            onChange={(e) => setSortByProductAmount(Number(e.target.value))}
-            name="sortByProductAmount"
-            id="sortByProductAmount"
-          >
-            <option value={0}>none</option>
-            <option value={1}>low to high</option>
-            <option value={-1}>high to low</option>
-          </select>
-        </div>
+      {products.length !== 0 && (
+        <div className="border-2 rounded-lg p-2 mx-10 flex flex-wrap items-center gap-6">
+          <div className="flex items-center gap-2">
+            <label htmlFor="filterCategoryId">Filter by category</label>
+            <select
+              value={filterCategoryId}
+              onChange={(e) => {
+                setFilterCategoryId(e.target.value);
+                setFilterSubCategoryId("none");
+              }}
+              className="border-2 rounded-lg p-2"
+              name="filterCategoryId"
+              id="filterCategoryId"
+            >
+              <option value="none">none</option>
+              {productCategories?.map((category) => {
+                return (
+                  <option
+                    key={category.productcategoryid}
+                    value={category.productcategoryid}
+                  >
+                    {category.categoryname}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+          <div className="flex items-center gap-2">
+            <p>Sort by amount</p>
+            <select
+              className="border-2 rounded-lg p-2"
+              value={sortByProductAmount}
+              onChange={(e) => setSortByProductAmount(Number(e.target.value))}
+              name="sortByProductAmount"
+              id="sortByProductAmount"
+            >
+              <option value={0}>none</option>
+              <option value={1}>low to high</option>
+              <option value={-1}>high to low</option>
+            </select>
+          </div>
 
-        {filterCategoryId!=="none" && <>
-        <div className="flex items-center gap-2">
-          <p>filter by subcategory</p>
-          <select className="border-2 rounded-lg p-2" value={filterSubCategoryId} onChange={(e) => setFilterSubCategoryId(e.target.value)} name="filterSubCategoryId" id="filterSubCategoryId">
-            <option value="none">none</option>
-            {filterSubCategories?.map((subcategory) => {
-              return <option key={subcategory.subcategoryid} value={subcategory.subcategoryid}>{subcategory.subcategoryname}</option>
-            })}
-          </select>
+          {filterCategoryId !== "none" && (
+            <>
+              <div className="flex items-center gap-2">
+                <p>filter by subcategory</p>
+                <select
+                  className="border-2 rounded-lg p-2"
+                  value={filterSubCategoryId}
+                  onChange={(e) => setFilterSubCategoryId(e.target.value)}
+                  name="filterSubCategoryId"
+                  id="filterSubCategoryId"
+                >
+                  <option value="none">none</option>
+                  {filterSubCategories?.map((subcategory) => {
+                    return (
+                      <option
+                        key={subcategory.subcategoryid}
+                        value={subcategory.subcategoryid}
+                      >
+                        {subcategory.subcategoryname}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+            </>
+          )}
         </div>
-        </>}
-      </div>}
+      )}
       <div className="flex flex-col gap-4 mx-10 my-2  p-4">
         {products
           ?.filter((product) => {
@@ -431,12 +492,13 @@ const AdminProducts = () => {
             }
           })
           ?.filter((product) => {
-            if(filterSubCategoryId==="none"){
+            if (filterSubCategoryId === "none") {
               return product;
             } else {
-              return product.subcategoryid===filterSubCategoryId;
+              return product.subcategoryid === filterSubCategoryId;
             }
-          })?.map((product) => {
+          })
+          ?.map((product) => {
             return (
               <AdminProductCard
                 key={product.productid}
@@ -453,42 +515,53 @@ const AdminProducts = () => {
             );
           })}
         {products?.filter((product) => {
-            if (filterCategoryId === "none") {
-              return product;
-            } else {
-              return product.productcategoryid === filterCategoryId;
-            }
-          })?.length===0 && <div className="flex justify-center my-20">
-            <div className="text-2xl text-red-500">No products in this category</div>
-          </div>}
-        {(products?.filter((product) => {
-          if(filterCategoryId==="none"){
-            return product;
-          } else {
-            return product.productcategoryid===filterCategoryId;
-          }
-        }).length!==0 &&products
-        ?.filter((product) => {
           if (filterCategoryId === "none") {
             return product;
           } else {
             return product.productcategoryid === filterCategoryId;
           }
-        })
-        ?.filter((product) => {
-          if(filterSubCategoryId==="none"){
+        })?.length === 0 && (
+          <div className="flex justify-center my-20">
+            <div className="text-2xl text-red-500">
+              No products in this category
+            </div>
+          </div>
+        )}
+        {products?.filter((product) => {
+          if (filterCategoryId === "none") {
             return product;
           } else {
-            return product.subcategoryid===filterSubCategoryId;
+            return product.productcategoryid === filterCategoryId;
           }
-        })?.length===0) && <div className="flex justify-center my-20">
-          <div className="text-2xl text-red-500">No products in this subcategory</div>
-          </div>}
-        {products.length===0 && <div className="my-20">
-          <div className="text-2xl text-red-500 flex justify-center">
-            No products added
+        }).length !== 0 &&
+          products
+            ?.filter((product) => {
+              if (filterCategoryId === "none") {
+                return product;
+              } else {
+                return product.productcategoryid === filterCategoryId;
+              }
+            })
+            ?.filter((product) => {
+              if (filterSubCategoryId === "none") {
+                return product;
+              } else {
+                return product.subcategoryid === filterSubCategoryId;
+              }
+            })?.length === 0 && (
+            <div className="flex justify-center my-20">
+              <div className="text-2xl text-red-500">
+                No products in this subcategory
+              </div>
+            </div>
+          )}
+        {products.length === 0 && (
+          <div className="my-20">
+            <div className="text-2xl text-red-500 flex justify-center">
+              No products added
+            </div>
           </div>
-        </div>}
+        )}
       </div>
     </>
   );
