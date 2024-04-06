@@ -1,4 +1,8 @@
-import React from "react";
+import axios from "axios";
+import React, { SetStateAction, useContext, useState } from "react";
+import { FaArrowDown, FaArrowUp } from "react-icons/fa";
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import { Cart, GlobalContext, backendUrl } from "../App";
 
 type ProductProps = {
   productid: number;
@@ -21,6 +25,34 @@ const ProductCard = ({
   subcategoryid,
   productthumbnail,
 }: ProductProps) => {
+  const [isShowDescription, setIsShowDescription] = useState<boolean>(false);
+  const {cart,setCart}:{cart:Cart[];setCart: React.Dispatch<React.SetStateAction<Cart[]>>} = useContext(GlobalContext);
+  
+  const addToCart = async (productid:number) => {
+try {
+      const response = await axios.post(`${backendUrl}/cart/add`,{
+        "productid":Number(productid),
+        "itemqty":1,
+      },{withCredentials:true});
+      console.log(response);
+      if(response.data.newCartItem.itemqty > 1){
+        const newCart = cart.map((item) => {
+          if(item.productid===productid){
+            return response.data.newCartItem;
+          } else {
+            return item;
+          }
+        });
+        setCart(newCart);
+      } else {
+        setCart(prevCart => [...prevCart,response.data.newCartItem]);
+      }
+} catch (error) {
+  console.log(error);
+}
+
+  }
+
   return (
     <>
       <div className="border-2 gap-4 rounded-lg p-2 w-[25%] h-96 shadow-lg flex flex-col">
@@ -32,13 +64,22 @@ const ProductCard = ({
           />
         </div>
         <div className="flex flex-col gap-1">
-          <div className="flex flex-wrap text-xl font-semibold text-red-500">
-            {productname}
+          <div className="flex text-xl items-center font-semibold gap-2">
+            <div className="flex flex-wrap items-center text-red-500">{productname}</div>
+            {!isShowDescription ? (
+              <button  className="text-2xl" onClick={() => setIsShowDescription(true)}>
+                <IoIosArrowDown />
+              </button>
+            ) : (
+              <button  className="text-2xl" onClick={() => setIsShowDescription(false)}>
+                <IoIosArrowUp />
+              </button>
+            )}
           </div>
-          <div className="flex flex-wrap text-md">{productdescription}</div>
+          {isShowDescription && <div className="flex flex-wrap text-md">{productdescription}</div>}
         </div>
         <div className="font-bold">Rs {productprice}</div>
-        <button className="w-[50%] mx-auto border-2 rounded-lg border-red-500 text-red-500 p-2 hover:bg-red-500 hover:text-white hover:duration-300">
+        <button onClick={() => addToCart(productid)} className="w-[50%] mx-auto border-2 rounded-lg border-red-500 text-red-500 p-2 hover:bg-red-500 hover:text-white hover:duration-300">
           Add to cart
         </button>
       </div>

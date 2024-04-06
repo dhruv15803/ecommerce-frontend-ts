@@ -6,6 +6,7 @@ import { SubCategory, backendUrl } from "../App";
 const ProductsLayout = () => {
   const { categoryid } = useParams();
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
+  const [categoryName,setCategoryName] = useState<string>("");
   console.log(categoryid);
 
   const getSubCategoriesByCategoryId = async () => {
@@ -23,14 +24,32 @@ const ProductsLayout = () => {
     }
   };
 
+  const getProductCategoryById = async () => {
+    try {
+      const response = await axios.post(
+        `${backendUrl}/product/getProductCategoryById`,
+        {
+          productcategoryid: categoryid,
+        }
+      );
+      setCategoryName(response.data.categoryname);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     getSubCategoriesByCategoryId();
+    getProductCategoryById();
   }, []);
 
   console.log(subCategories);
 
   return (
     <>
+      <div className="mx-12 my-10 p-2 flex items-center font-semibold text-3xl">
+        {categoryName[0]?.toUpperCase() + categoryName?.slice(1)}
+      </div>
       <div className="flex items-center gap-4 p-2 m-12 text-red-500 text-2xl font-semibold">
         <NavLink
           to="."

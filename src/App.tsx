@@ -13,6 +13,7 @@ import AdminSubCategories from "./Pages/AdminSubCategories";
 import Profile from "./Pages/Profile";
 import ProductsLayout from "./Layouts/ProductsLayout";
 import Products from "./Pages/Products";
+import Cart from "./Pages/Cart";
 
 // ecommerce
 // made register page
@@ -47,12 +48,18 @@ export interface User {
 export interface Product {
   productid: number;
   productname: string;
-  productdescription:string;
+  productdescription: string;
   productprice: number;
   productstock: number;
   productcategoryid: number;
   subcategoryid: number;
   productthumbnail: string;
+}
+
+export interface Cart extends Product {
+  cartid: number;
+  itemqty: number;
+  userid: number;
 }
 
 export interface SubCategory {
@@ -74,6 +81,9 @@ function App() {
   const [productCategories, setProductCategories] = useState<
     productCategoryType[] | []
   >([]);
+  const [cart, setCart] = useState<Cart[]>([]);
+
+  console.log(cart);
 
   const getLoggedInUser = async () => {
     try {
@@ -99,6 +109,17 @@ function App() {
     }
   };
 
+  const getCartItems = async () => {
+    try {
+      const response = await axios.get(`${backendUrl}/cart/getCartProducts`, {
+        withCredentials: true,
+      });
+      setCart(response.data.cartProducts);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const getAllProducts = async () => {
     try {
       const response = await axios.get(`${backendUrl}/product/getAllProducts`);
@@ -112,6 +133,7 @@ function App() {
     getAllProductCategories();
     getLoggedInUser();
     getAllProducts();
+    getCartItems();
   }, []);
 
   return (
@@ -128,6 +150,8 @@ function App() {
           setProducts,
           productCategories,
           setProductCategories,
+          cart,
+          setCart,
         }}
       >
         <Router>
@@ -136,10 +160,11 @@ function App() {
               <Route index element={<Home />} />
               <Route path="register" element={<Register />} />
               <Route path="login" element={<Login />} />
-              <Route path="profile" element={<Profile/>}/>
-              <Route path="products/:categoryid" element={<ProductsLayout/>}>
-                <Route index element={<Products/>}/>
-                <Route path=":subcategoryid" element={<Products/>}/>
+              <Route path="profile" element={<Profile />}/>
+              <Route path="cart" element={<Cart/>}/>
+              <Route path="products/:categoryid" element={<ProductsLayout />}>
+                <Route index element={<Products />} />
+                <Route path=":subcategoryid" element={<Products />} />
               </Route>
               <Route path="admin" element={<AdminLayout />}>
                 <Route index element={<AdminProducts />} />

@@ -42,7 +42,7 @@ const AdminProductCard = ({
   const [newProductPrice, setNewProductPrice] = useState<number>(0);
   const [newProductStock, setNewProductStock] = useState<number>(0);
   const [newProductCategoryId, setNewProductCategoryId] = useState<number>(0);
-  const [newSubCategoryId, setNewSubCategoryId] = useState<number>(0);
+  const [newSubCategoryId, setNewSubCategoryId] = useState<number>(subcategoryid);
   const {
     productCategories,
     products,
@@ -97,7 +97,6 @@ const AdminProductCard = ({
       );
       console.log(response);
       setSubCategories(response.data.subcategories);
-      setNewSubCategoryId(response.data.subcategories[0].subcategoryid);
     } catch (error) {
       console.log(error);
     }
@@ -177,8 +176,8 @@ const AdminProductCard = ({
   useEffect(() => {
     getProductCategoryById();
     getSubCategoryById();
-  }, []);
-
+  }, [products]);
+  
   useEffect(() => {
     getSubCategories();
   }, [newProductCategoryId]);

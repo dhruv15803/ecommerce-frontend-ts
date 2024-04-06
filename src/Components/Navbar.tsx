@@ -2,9 +2,10 @@ import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GlobalContext, backendUrl } from "../App";
 import axios from "axios";
+import { FaCartShopping } from "react-icons/fa6";
 
 const Navbar = () => {
-  const { isLoggedIn, loggedInUser, setIsLoggedIn, setLoggedInUser } =
+  const { isLoggedIn, loggedInUser, setIsLoggedIn, setLoggedInUser,cart} =
     useContext(GlobalContext);
   const navigate = useNavigate();
 
@@ -24,7 +25,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="flex items-center justify-between p-2 bg-red-500 text-white">
+      <nav className="flex items-center justify-between p-4 bg-red-500 text-white">
         <div className="text-4xl">
           <Link to="/">eBazzar</Link>
         </div>
@@ -35,6 +36,14 @@ const Navbar = () => {
           </div>
         ) : (
           <div className="flex items-center gap-14">
+            <Link to='/cart'>
+            <div className="flex items-center">
+              <button className="text-3xl"><FaCartShopping/></button>
+              <div className="border-2-red-500 rounded-full px-1 relative bottom-4 right-2 text-red-500 bg-white">
+                {cart.length}
+              </div>
+            </div>
+            </Link>
             <div className="flex items-center gap-2">
               {loggedInUser.avatarurl !== "" && (
                 <img
