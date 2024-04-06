@@ -65,10 +65,10 @@ const CartCard = ({
   return (
     <>
       <div className="border-2 rounded-lg p-2 shadow-lg flex  gap-4">
-        <div className="w-[20%] border-2 flex justify-center rounded-lg">
+        <div className="w-[20%]  flex justify-center rounded-lg">
           <img className="object-contain" src={productthumbnail} alt="" />
         </div>
-        <div className="flex flex-col border-2 p-2 w-full gap-2">
+        <div className="flex flex-col p-2 w-full gap-2">
           <div className="flex flex-col">
             <div className="text-2xl font-semibold">{productname}</div>
             <div className="text-lg">{productdescription}</div>
