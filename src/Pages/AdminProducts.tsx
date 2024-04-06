@@ -236,10 +236,10 @@ const AdminProducts = () => {
               ) : (
                 <>
                   <label
-                    className="flex justify-center items-center gap-2 border-2 rounded-lg p-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white hover:duration-300 w-[15%]"
+                    className="w-[25%] flex justify-center items-center gap-2 border-2 rounded-lg p-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white hover:duration-300 lg:w-[15%]"
                     htmlFor="productThumbnail"
                   >
-                    <FaImage />
+                    <button className="text-2xl"><FaImage /></button>
                     Add image
                   </label>
                   <input
@@ -367,7 +367,7 @@ const AdminProducts = () => {
           </form>
         </div>
       )}
-      {products.length!==0 && <div className="border-2 rounded-lg p-2 mx-10 flex items-center gap-6">
+      {products.length!==0 && <div className="border-2 rounded-lg p-2 mx-10 flex flex-wrap items-center gap-6">
         <div className="flex items-center gap-2">
           <label htmlFor="filterCategoryId">Filter by category</label>
           <select
