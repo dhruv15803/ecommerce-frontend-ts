@@ -44,8 +44,8 @@ const AdminProducts = () => {
   const [filterSubCategories, setFilterSubCategories] = useState<SubCategory[]>(
     []
   );
-  const [csvFile,setCsvFile] = useState<File | string>("");
-  const [csvData,setCsvData] = useState<any>([]);
+  const [csvFile, setCsvFile] = useState<File | string>("");
+  const [csvData, setCsvData] = useState<any>([]);
 
   const uploadProductThumbnail = async () => {
     try {
@@ -145,16 +145,23 @@ const AdminProducts = () => {
   };
 
   const addCsvProducts = async () => {
-try {
-  const response = await axios.post(`${backendUrl}/product/addCsv`,{
-    "csvData":csvData,
-  },{withCredentials:true});
-  console.log(response);
-  setProducts(prevProducts => [...prevProducts,...response.data.newProducts]);
-  setCsvFile("");
-} catch (error) {
-  console.log(error);
-}
+    try {
+      const response = await axios.post(
+        `${backendUrl}/product/addCsv`,
+        {
+          csvData: csvData,
+        },
+        { withCredentials: true }
+      );
+      console.log(response);
+      setProducts((prevProducts) => [
+        ...prevProducts,
+        ...response.data.newProducts,
+      ]);
+      setCsvFile("");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const deleteProduct = async (id: number) => {
@@ -191,13 +198,13 @@ try {
   };
 
   const parseCsvFile = () => {
-    Papa.parse(csvFile,{
-      complete:(result:any) => {
+    Papa.parse(csvFile, {
+      complete: (result: any) => {
         setCsvData(result.data);
       },
-      header:true,
-      skipEmptyLines:true,
-    })
+      header: true,
+      skipEmptyLines: true,
+    });
   };
 
   console.log(products);
@@ -218,9 +225,9 @@ try {
     getSubCategoriesByCategoryId();
   }, [filterCategoryId]);
 
-  useEffect(()=>{
+  useEffect(() => {
     parseCsvFile();
-  },[csvFile])
+  }, [csvFile]);
 
   console.log(csvData);
 
@@ -247,15 +254,35 @@ try {
         >
           {isAddProduct ? "Cancel" : "Add product"}
         </div>
-        {csvFile==="" ? <div className="cursor-pointer hover:underline hover:underline-offset-2">
-          <label htmlFor="csvFile">upload csv file</label>
-          <input hidden onChange={(e) =>setCsvFile(e.target.files![0])} type="file" name="csvFile" id="csvFile"/>
-        </div> : <>
-        <div className="flex gap-2">
-          <button className="hover:underline hover:underline-offset-4" onClick={() => setCsvFile("")}>remove file</button>
-          <button className="hover:underline hover:underline-offset-4" onClick={addCsvProducts}>submit file</button>
-        </div>
-        </>}
+        {csvFile === "" ? (
+          <div className="cursor-pointer hover:underline hover:underline-offset-2">
+            <label htmlFor="csvFile">upload csv file</label>
+            <input
+              hidden
+              onChange={(e) => setCsvFile(e.target.files![0])}
+              type="file"
+              name="csvFile"
+              id="csvFile"
+            />
+          </div>
+        ) : (
+          <>
+            <div className="flex gap-2">
+              <button
+                className="hover:underline hover:underline-offset-4"
+                onClick={() => setCsvFile("")}
+              >
+                remove file
+              </button>
+              <button
+                className="hover:underline hover:underline-offset-4"
+                onClick={addCsvProducts}
+              >
+                submit file
+              </button>
+            </div>
+          </>
+        )}
       </div>
       {isAddProduct && (
         <div className="border-2 rounded-lg flex flex-col shadow-lg mx-10 p-4">

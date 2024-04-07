@@ -27,7 +27,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="flex items-center p-4 bg-red-500 text-white">
+      <nav className="sticky top-0 z-10 flex items-center p-4 bg-red-500 text-white">
         <div className="text-4xl mr-10">
           <Link to="/">eBazzar</Link>
         </div>

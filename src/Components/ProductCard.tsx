@@ -55,7 +55,7 @@ try {
 
   return (
     <>
-      <div className="w-full border-2 gap-4 rounded-lg p-2 sm:w-[25%] h-96 shadow-lg flex flex-col">
+      <div className="border-2 gap-4 w-[40%] rounded-lg p-2 sm:w-[25%] h-96 shadow-lg flex flex-col">
         <div className="flex justify-center h-[45%]">
           <img
             src={productthumbnail}
@@ -79,7 +79,7 @@ try {
           {isShowDescription && <div className="flex flex-wrap text-md">{productdescription}</div>}
         </div>
         <div className="font-bold">Rs {productprice}</div>
-        <button onClick={() => addToCart(productid)} className="w-[50%] mx-auto border-2 rounded-lg border-red-500 text-red-500 p-2 hover:bg-red-500 hover:text-white hover:duration-300">
+        <button onClick={() => addToCart(productid)} className=" sm:w-[50%] mx-auto border-2 rounded-lg border-red-500 text-red-500 p-2 hover:bg-red-500 hover:text-white hover:duration-300">
           Add to cart
         </button>
       </div>
