@@ -107,7 +107,7 @@ const Register = () => {
 
   return (
     <>
-      <div className="rounded-lg flex justify-center flex-col m-10 p-4">
+      <div className="rounded-lg flex justify-center flex-col md:m-10 p-4">
         <h1 className="text-red-500 font-semibold text-2xl flex justify-center">
           Register
         </h1>
@@ -157,8 +157,8 @@ const Register = () => {
               id="avatar"
             />
           </div>
-          <div className="flex items-center gap-4 border-2 mx-[15%] rounded-lg p-4 shadow-lg">
-            <div className="flex gap-2 items-center">
+          <div className=" flex-col flex md:flex-row items-center gap-4 border-2 mx-[15%] rounded-lg p-4 shadow-lg">
+            <div className="flex-col flex md:flex-row gap-2 items-center">
               <label className="text-red-400" htmlFor="username">
                 Enter username
               </label>
@@ -172,7 +172,7 @@ const Register = () => {
                 id="username"
               />
             </div>
-            <div className="flex gap-2 items-center">
+            <div className="flex-col flex md:flex-row gap-2 items-center">
               <label className="text-red-400" htmlFor="email">
                 Enter email
               </label>
@@ -187,8 +187,8 @@ const Register = () => {
               />
             </div>
           </div>
-          <div className="flex items-center gap-4   border-2 mx-[15%] rounded-lg p-4 shadow-lg">
-            <div className="flex gap-2 items-center">
+          <div className=" flex-col flex md:flex-row items-center gap-4   border-2 mx-[15%] rounded-lg p-4 shadow-lg">
+            <div className="flex-col flex md:flex-row gap-2 items-center">
               <label className="text-red-400" htmlFor="firstname">
                 Enter first name
               </label>
@@ -202,7 +202,7 @@ const Register = () => {
                 placeholder="eg: emily"
               />
             </div>
-            <div className="flex gap-2 items-center ">
+            <div className="flex-col flex md:flex-row gap-2 items-center ">
               <label className="text-red-400" htmlFor="lastname">
                 Enter last name
               </label>
@@ -217,9 +217,9 @@ const Register = () => {
               />
             </div>
           </div>
-          <div className="flex flex-col gap-2  border-2 mx-[15%] rounded-lg p-4 shadow-lg">
-            <div className="flex items-center gap-4">
-              <div className="flex gap-2 items-center">
+          <div className=" flex flex-col gap-2  border-2 mx-[15%] rounded-lg p-4 shadow-lg">
+            <div className=" flex-col flex  md:flex-row items-center gap-4">
+              <div className="flex-col flex md:flex-row gap-2 items-center">
                 <label className="text-red-400" htmlFor="password">
                   Enter password
                 </label>
@@ -232,7 +232,7 @@ const Register = () => {
                   id="password"
                 />
               </div>
-              <div className="flex gap-2 items-center">
+              <div className="flex-col flex md:flex-row gap-2 items-center">
                 <label className="text-red-400" htmlFor="confirmPassword">
                   Confirm password
                 </label>

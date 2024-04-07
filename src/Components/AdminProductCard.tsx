@@ -190,7 +190,7 @@ const AdminProductCard = ({
         <div className="flex flex-col gap-4 w-[20%]">
           {!isProductEdit && (
             <div className="flex flex-wrap justify-center">
-              <img className="h-40" src={productthumbnail} alt="" />
+              <img className="h-40 object-contain" src={productthumbnail} alt="" />
             </div>
           )}
           {isProductThumbnailLoading ? <div className="flex justify-center">
