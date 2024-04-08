@@ -229,8 +229,6 @@ const AdminProducts = () => {
     parseCsvFile();
   }, [csvFile]);
 
-  console.log(csvData);
-
   useEffect(() => {
     const setInitialCategory = () => {
       if (productCategories.length === 0) {
@@ -241,9 +239,6 @@ const AdminProducts = () => {
     };
     setInitialCategory();
   }, [productCategories]);
-
-  console.log("filterSubCategoryId", filterSubCategoryId);
-  console.log("filterCategoryId", filterCategoryId);
 
   return (
     <>

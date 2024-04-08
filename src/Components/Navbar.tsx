@@ -37,7 +37,7 @@ const Navbar = () => {
           })}
         </ul>
         {!isLoggedIn ? (
-          <div className="hidden lg:flex lg:items-center lg:gap-4">
+          <div className="hidden lg:flex lg:items-center lg:absolute lg:right-16 lg:gap-4">
             <Link to="/register">Register</Link>
             <Link to="/login">Login</Link>
           </div>
@@ -52,6 +52,7 @@ const Navbar = () => {
               </div>
             </div>
             </Link>
+            <Link to='/profile'>
             <div className="flex items-center gap-2">
               {loggedInUser.avatarurl !== "" && (
                 <img
@@ -62,6 +63,7 @@ const Navbar = () => {
               )}
               <p>{loggedInUser.username}</p>
             </div>
+            </Link>
             <button onClick={logoutUser} className="text-xl">
               Logout
             </button>
@@ -70,7 +72,7 @@ const Navbar = () => {
         )}
       <button className="lg:hidden text-2xl absolute right-5" onClick={() => setIsHamburgerOpen(!isHamburgerOpen)}><RxHamburgerMenu /></button>
       </nav>
-      {isHamburgerOpen && <div onClick={() => setIsHamburgerOpen(false)} className="flex gap-4 flex-col p-4 bg-red-500 text-white text-xl">
+      {isHamburgerOpen && <div onClick={() => setIsHamburgerOpen(false)} className="sticky top-[72px] flex gap-4 flex-col p-4 bg-red-500 text-white text-xl">
         {productCategories?.map((category) => {
           return <NavLink className={({isActive}) => isActive ? 'underline underline-offset-8' : ""}  to={`products/${category.productcategoryid}`} key={category.productcategoryid}><div>{category.categoryname}</div></NavLink>
         })}

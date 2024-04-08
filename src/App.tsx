@@ -43,10 +43,13 @@ export interface User {
   isadmin: boolean;
   avatarurl: string;
   password: string;
+  city:string;
+  pincode:number;
+  state:string;
 }
 
 export interface Product {
-  productid: number;
+  productid?: number;
   productname: string;
   productdescription: string;
   productprice: number;
@@ -115,6 +118,7 @@ function App() {
         withCredentials: true,
       });
       setCart(response.data.cartProducts);
+      console.log(response);
     } catch (error) {
       console.log(error);
     }
@@ -130,11 +134,14 @@ function App() {
   };
 
   useEffect(() => {
-    getAllProductCategories();
     getLoggedInUser();
+    getAllProductCategories();
     getAllProducts();
-    getCartItems();
   }, []);
+
+  useEffect(()=>{
+    getCartItems();
+  },[isLoggedIn])
 
   return (
     <>

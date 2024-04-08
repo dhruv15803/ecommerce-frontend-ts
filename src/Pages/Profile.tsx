@@ -22,6 +22,12 @@ const Profile = () => {
   const [isAvatarLoading, setIsAvatarLoading] = useState<boolean>(false);
   const [newAvatarUrl, setNewAvatarUrl] = useState<string>("");
   const [isAvatarEdit, setIsAvatarEdit] = useState<boolean>(false);
+  const [addressField1, setAddressField1] = useState<string>("");
+  const [addressField2, setAddressField2] = useState<string>("");
+  const [city, setCity] = useState<string>("");
+  const [state, setState] = useState<string>("");
+  const [pincode, setPincode] = useState<number | string>("");
+  const [isEditUserAddress,setIsEditUserAddress] = useState<boolean>(false);
 
   const checkPassword = async () => {
     try {
@@ -116,6 +122,27 @@ const Profile = () => {
     }
   };
 
+  const addUserAddressData = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        `${backendUrl}/user/addUserAddress`,
+        {
+          address_field_1: addressField1,
+          address_field_2: addressField2,
+          state,
+          city,
+          pincode,
+        },
+        { withCredentials: true }
+      );
+      setLoggedInUser(response.data.newUser);
+      setIsEditUserAddress(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     checkPassword();
   }, [currentPassword]);
@@ -125,9 +152,10 @@ const Profile = () => {
   }, [newAvatar]);
 
   console.log(newAvatar);
+
   return (
     <>
-      <div className="border-2 rounded-lg p-4 flex flex-col items-center  m-10 shadow-lg">
+      <div className="border-2 rounded-lg p-4 flex flex-col  m-10 shadow-lg">
         <div className="text-2xl font-semibold">User profile</div>
         <div className="flex items-center my-4">
           {loggedInUser.avatarurl !== "" && (
@@ -146,20 +174,22 @@ const Profile = () => {
                         alt=""
                       />
                     )}
-                    {!isAvatarLoading && <div className="flex items-center gap-2">
-                      <button
-                        className="border-2 rounded-lg border-red-500 text-red-500 p-2 hover:bg-red-500 hover:text-white hover:duration-300"
-                        onClick={() => setIsAvatarEdit(false)}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        className="border-2 rounded-lg border-red-500 text-red-500 p-2 hover:bg-red-500 hover:text-white hover:duration-300"
-                        onClick={editAvatar}
-                      >
-                        Edit avatar
-                      </button>
-                    </div>}
+                    {!isAvatarLoading && (
+                      <div className="flex items-center gap-2">
+                        <button
+                          className="border-2 rounded-lg border-red-500 text-red-500 p-2 hover:bg-red-500 hover:text-white hover:duration-300"
+                          onClick={() => setIsAvatarEdit(false)}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          className="border-2 rounded-lg border-red-500 text-red-500 p-2 hover:bg-red-500 hover:text-white hover:duration-300"
+                          onClick={editAvatar}
+                        >
+                          Edit avatar
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </>
               ) : (
@@ -193,12 +223,20 @@ const Profile = () => {
           )}
         </div>
         <div className="flex-col items-center my-4 gap-4">
-          <div className="text-2xl font-semibold my-4">
-            {loggedInUser.email}
+          <div className="flex gap-4 items-center text-xl my-4">
+            <span>Email</span>
+            <input
+              className="border-2 rounded-lg p-2 bg-blue-100"
+              readOnly
+              value={loggedInUser.email}
+              type="text"
+              name=""
+              id=""
+            />
           </div>
           {!isEditUsername ? (
             <div className="flex gap-4 items-center font-semobold">
-              <p className="text-2xl">{loggedInUser.username}</p>
+              <p className="text-xl">{loggedInUser.username}</p>
               <button
                 onClick={() => {
                   setIsEditUsername(true);
@@ -216,7 +254,7 @@ const Profile = () => {
                 className="flex items-center gap-4"
               >
                 <input
-                  className="border-2 rounded-lg p-2"
+                  className="border-2 rounded-lg p-2 bg-blue-100"
                   value={newUsername}
                   onChange={(e) => setNewUsername(e.target.value)}
                   type="text"
@@ -237,10 +275,10 @@ const Profile = () => {
             </div>
           )}
         </div>
-        <div className="flex flex-col items-center my-4 gap-2">
+        <div className=" my-4 gap-2">
           <button
             onClick={() => setIsEditPassword(!isEditPassword)}
-            className="text-red-500 hover:underline hover:underline-offset-2"
+            className=" text-red-500 hover:underline hover:underline-offset-2"
           >
             {isEditPassword ? "cancel" : "edit password"}
           </button>
@@ -249,7 +287,7 @@ const Profile = () => {
               <div className="flex items-center gap-2">
                 <p>Enter current password</p>
                 <input
-                  className="border-2 rounded-lg p-2"
+                  className="border-2 rounded-lg p-2 bg-blue-100"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   type="password"
@@ -258,24 +296,112 @@ const Profile = () => {
                 />
               </div>
               {isPasswordCorrect && (
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col gap-2">
                   <p>Enter new password</p>
-                  <form onSubmit={(e) => editPassword(e)}>
+                  <form
+                    className="flex flex-col gap-2"
+                    onSubmit={(e) => editPassword(e)}
+                  >
                     <input
-                      className="border-2 rounded-lg p-2"
+                      className="border-2 rounded-lg p-2 bg-blue-100"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       type="password"
                       name="newPassword"
                       id="newPassword"
                     />
-                    <button>submit</button>
+                    <button className="border-2 rounded-lg p-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white hover:duration-300">
+                      submit
+                    </button>
                   </form>
                 </div>
               )}
             </div>
           )}
         </div>
+        <div className="flex items-center gap-4 my-4">
+          <span className="font-semibold text-xl">User address information</span>
+          <button className="text-red-500 hover:underline hover:underline-offset-4" onClick={() => {
+            setIsEditUserAddress(!isEditUserAddress);
+            setAddressField1(loggedInUser?.address_field_1!);
+            setAddressField2(loggedInUser?.address_field_2!);
+            setCity(loggedInUser?.city);
+            setPincode(loggedInUser?.pincode);
+            setState(loggedInUser?.state);
+          }}>{isEditUserAddress ? "Cancel" : "Edit"}</button>
+        </div>
+        <form
+          className="flex flex-col gap-8"
+          onSubmit={(e) => addUserAddressData(e)}
+        >
+          <div className="flex flex-col  lg:flex-row lg:items-center gap-4">
+            <div className="flex flex-col justify-center lg:w-[50%] gap-4">
+              <label className="font-semibold" htmlFor="address_field_1">Address field 1</label>
+              {isEditUserAddress ? <input
+                value={addressField1}
+                onChange={(e) => setAddressField1(e.target.value)}
+                className="border-2 rounded-lg p-2 bg-blue-100"
+                type="text"
+                name="address_field_1"
+                id="address_field_1"
+                placeholder="eg: J -459, Galaxy apartments"
+              /> : <div>{loggedInUser.address_field_1===null ? 'null' :loggedInUser.address_field_1 }</div>}
+            </div>
+            <div className="flex flex-col justify-center lg:w-[50%] gap-4">
+              <label className="font-semibold" htmlFor="address_field_2">Address field 2</label>
+              {isEditUserAddress ? <input
+                value={addressField2}
+                onChange={(e) => setAddressField2(e.target.value)}
+                className="border-2 rounded-lg p-2 bg-blue-100"
+                type="text"
+                name="address_field_2"
+                id="address_field_2"
+                placeholder="eg:street name , landmarks"
+              />: <div>{loggedInUser.address_field_2===null ? 'null' :loggedInUser.address_field_2 }</div>}
+            </div>
+          </div>
+          <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+            <div className="flex flex-col justify-center lg:w-[25%] gap-4">
+              <label className="font-semibold" htmlFor="city">city</label>
+              {isEditUserAddress ?  <input
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="border-2 rounded-lg p-2 bg-blue-100"
+                type="text"
+                name="city"
+                id="city"
+                placeholder="eg:mumbai"
+              /> : <div>{loggedInUser.city===null ? 'null' : loggedInUser.city}</div>}
+            </div>
+            <div className="flex flex-col justify-center lg:w-[25%] gap-4">
+              <label className="font-semibold" htmlFor="pincode"> pincode</label>
+              {isEditUserAddress ? <input
+                value={pincode}
+                onChange={(e) => setPincode(Number(e.target.value))}
+                className="border-2 rounded-lg p-2 bg-blue-100"
+                type="number"
+                name="pincode"
+                id="pincode"
+                placeholder="400069"
+              /> : <div>{loggedInUser.pincode === null ? 'null' : loggedInUser.pincode}</div>}
+            </div>
+            <div className="flex flex-col justify-center lg:w-[50%] gap-4">
+              <label className="font-semibold" htmlFor="state">state</label>
+              {isEditUserAddress ?  <input
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                className="border-2 rounded-lg p-2 bg-blue-100"
+                type="text"
+                name="state"
+                id="state"
+                placeholder="eg: Maharashtra"
+              /> : <div>{loggedInUser.state === null ? 'null' : loggedInUser.state}</div>}
+            </div>
+          </div>
+          {isEditUserAddress && <button className="border-2 rounded-lg p-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white hover:duration-300">
+            Submit
+          </button>}
+        </form>
       </div>
     </>
   );

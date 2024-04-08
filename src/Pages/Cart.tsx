@@ -123,8 +123,8 @@ const Cart = () => {
     <>
       <div className="flex m-10 items-center text-3xl font-semibold">Cart</div>
 
-      <div className="flex flex-col lg:flex-row gap-4 m-10">
-        <div className="flex lg:w-[80%] flex-col justify-center gap-4 mx-10">
+      <div className="flex flex-col xl:flex-row gap-4 m-10">
+        <div className="flex xl:w-[80%] flex-col justify-center gap-4 mx-10">
           {cart?.map((item) => {
             return (
               <CartCard
@@ -147,7 +147,7 @@ const Cart = () => {
             );
           })}
         </div>
-        <div className="mx-10 flex lg:w-[20%] lg:mx-0 flex-col border-2 rounded-lg shadow-lg p-4">
+        <div className="mx-10 flex xl:w-[20%] xl:mx-0 flex-col border-2 rounded-lg shadow-lg p-4">
           <div className="flex font-semibold text-3xl items-center">
             Order summary
           </div>
