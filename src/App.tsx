@@ -85,6 +85,7 @@ function App() {
     productCategoryType[] | []
   >([]);
   const [cart, setCart] = useState<Cart[]>([]);
+  const [modal,setModal] = useState<boolean>(false);
 
   console.log(cart);
 
@@ -163,7 +164,7 @@ function App() {
       >
         <Router>
           <Routes>
-            <Route path="/" element={<Layout />}>
+            <Route path="/" element={<Layout modal={modal} setModal={setModal} />}>
               <Route index element={<Home />} />
               <Route path="register" element={<Register />} />
               <Route path="login" element={<Login />} />

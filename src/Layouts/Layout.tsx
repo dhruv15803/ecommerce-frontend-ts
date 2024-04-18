@@ -1,11 +1,16 @@
-import React from 'react'
+import React, { SetStateAction } from 'react'
 import Navbar from '../Components/Navbar'
 import { Outlet } from 'react-router-dom'
 
-const Layout = () => {
+type LayoutProps = {
+  modal:boolean;
+  setModal: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const Layout = ({modal,setModal} : LayoutProps) => {
   return (
     <>
-    <Navbar/>
+    <Navbar modal={modal} setModal={setModal}/>
     <Outlet/>
     </>
   )

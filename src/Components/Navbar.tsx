@@ -4,8 +4,15 @@ import { GlobalContext, backendUrl, productCategoryType } from "../App";
 import axios from "axios";
 import { FaCartShopping } from "react-icons/fa6";
 import { RxHamburgerMenu } from "react-icons/rx";
+import Modal from "./Modal";
 
-const Navbar = () => {
+type NavBarProps = {
+  modal:boolean;
+  setModal: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+
+const Navbar = ({modal,setModal}:NavBarProps) => {
   const { isLoggedIn, loggedInUser, setIsLoggedIn, setLoggedInUser,cart,productCategories,isAdmin}:{productCategories:productCategoryType[]} =
     useContext(GlobalContext);
   const navigate = useNavigate();
@@ -64,7 +71,7 @@ const Navbar = () => {
               <p>{loggedInUser.username}</p>
             </div>
             </Link>
-            <button onClick={logoutUser} className="text-xl">
+            <button onClick={() => setModal(true)} className="text-xl">
               Logout
             </button>
           </div>
@@ -98,7 +105,7 @@ const Navbar = () => {
             {isAdmin && <div className="flex items-center">
               <Link to='/admin'>Admin panel</Link>
             </div>}
-            <div onClick={logoutUser} className="text-xl cursor-pointer">
+            <div onClick={() => setModal(true)} className="text-xl cursor-pointer">
               Logout
             </div>
         </> : <>
@@ -108,6 +115,7 @@ const Navbar = () => {
           </div>
         </>}
         </div>}
+        {modal && <Modal logoutUser={logoutUser} setModal={setModal}/>}
     </>
   );
 };
